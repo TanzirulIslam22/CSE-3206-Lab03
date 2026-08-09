@@ -78,3 +78,45 @@ public:
         return history.back(); // Return the previous state
     }
 };
+
+// The Originator: The actual text editor combining both patterns
+class SmartTextEditor : public EditorEventPublisher
+{
+private:
+    string document;
+
+public:
+    // Core Feature: Write text
+    void write(const string &text)
+    {
+        document += text + " ";
+        notifySubscribers(document); // Trigger Member 2's Observers
+    }
+
+    // Memento Feature: Create snapshot for Member 1's HistoryManager
+    shared_ptr<EditorMemento> createSnapshot()
+    {
+        return make_shared<EditorMemento>(document);
+    }
+
+    // Memento Feature: Restore from snapshot
+    void restore(shared_ptr<EditorMemento> memento)
+    {
+        if (memento)
+        {
+            document = memento->getSavedState();
+        }
+        else
+        {
+            document = "";
+        }
+        cout << "\n--- UNDO TRIGGERED ---\n";
+        notifySubscribers(document); // Alert observers of the restored state
+    }
+
+    void printDocument()
+    {
+        cout << "Document: " << document << "\n";
+    }
+};
+
