@@ -120,3 +120,37 @@ public:
     }
 };
 
+
+// The Main Application Loop (Member 3 Feature)
+int main() {
+    SmartTextEditor editor;
+    HistoryManager history;
+    
+    // Member 3 wires up Member 2's plugin
+    auto wordCountPlugin = make_shared<WordCounter>();
+    editor.subscribe(wordCountPlugin);
+
+    auto spellCheckerPlugin = make_shared<SpellChecker>();
+    editor.subscribe(spellCheckerPlugin);
+
+    // Initial save
+    history.saveState(editor.createSnapshot());
+
+    // Feature Loop
+    cout << "Typing 'hello'...\n";
+    editor.write("hello");
+    history.saveState(editor.createSnapshot());
+
+    cout << "\nTyping 'worldd'...\n";
+    editor.write("worldd");
+    history.saveState(editor.createSnapshot());
+    
+    cout << "\nCurrent Document State:\n";
+    editor.printDocument();
+
+    // Triggering Undo
+    editor.restore(history.undo());
+    editor.printDocument();
+
+    return 0;
+}
